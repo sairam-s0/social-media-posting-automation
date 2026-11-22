@@ -1,7 +1,56 @@
+# Node dependencies & caches
 node_modules/
-.env
-__pycache__/
-*.db
-.python-packages/
 .npm-cache/
+
+# Python Virtual Environments
+.venv/
+python3.11/
+.python-packages/
+
+# Compiled Executables, Installers & Binaries (Uploaded to GitHub Releases)
+*.exe
+*.dll
+*.so
+*.dylib
 dist/
+build/
+installer_dist/
+
+# PyInstaller Build Specs & Artifacts
+AutoSocialPoster.spec
+
+# Environment & Sensitive Keys
+.env
+.env.*
+!.env.example
+*.key
+license.key
+*.pem
+*.pfx
+
+# Python Cache & Testing Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local SQLite Databases & Logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.lock
+app.lock
+
+# IDE & Editor Metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS System Files
+Thumbs.db
+Desktop.ini
+.DS_Store

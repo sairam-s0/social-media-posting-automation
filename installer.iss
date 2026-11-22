@@ -1,5 +1,5 @@
 ; Inno Setup Script for AutoSocial Poster
-; Generates a professional Windows installer poster-v2.exe with activation check, desktop shortcut and clean uninstaller
+; Generates a professional Windows installer poster-v2.exe with desktop shortcut and clean uninstaller
 
 #define MyAppName "AutoSocial Poster"
 #define MyAppVersion "1.0.1"
@@ -30,11 +30,6 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Messages]
-PasswordLabel1=This installation requires an Activation Key.
-PasswordLabel3=Please enter your product Activation Key below to begin installation:
-PasswordEditLabel=&Activation Key:
-
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
@@ -54,34 +49,3 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}
 Name: "{userappdata}\AutoSocialPoster\data"; Flags: uninsneveruninstall
 Name: "{userappdata}\AutoSocialPoster\logs"; Flags: uninsneveruninstall
 Name: "{userappdata}\AutoSocialPoster\config"; Flags: uninsneveruninstall
-
-[Code]
-var
-  SavedActivationKey: String;
-
-function CheckPassword(Password: String): Boolean;
-var
-  Key: String;
-begin
-  Key := Uppercase(Trim(Password));
-  if (Key = 'ASPC-PRO2-2026-X999-9364') or (Key = 'POSTER-V2-PRO-2026') then
-  begin
-    SavedActivationKey := Key;
-    Result := True;
-  end
-  else
-    Result := False;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  ConfigDir, LicenseFile: String;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    ConfigDir := ExpandConstant('{userappdata}\AutoSocialPoster\config');
-    ForceDirectories(ConfigDir);
-    LicenseFile := ConfigDir + '\license.key';
-    SaveStringToFile(LicenseFile, SavedActivationKey, False);
-  end;
-end;

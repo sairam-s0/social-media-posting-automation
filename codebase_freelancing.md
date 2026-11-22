@@ -315,13 +315,62 @@ REDDIT_REDIRECT_URI=http://127.0.0.1:8000/auth/reddit/callback
 > **File Path:** `.gitignore`
 
 ```gitignore
+# Node dependencies & caches
 node_modules/
-.env
-__pycache__/
-*.db
-.python-packages/
 .npm-cache/
+
+# Python Virtual Environments
+.venv/
+python3.11/
+.python-packages/
+
+# Compiled Executables, Installers & Binaries (Uploaded to GitHub Releases)
+*.exe
+*.dll
+*.so
+*.dylib
 dist/
+build/
+installer_dist/
+
+# PyInstaller Build Specs & Artifacts
+AutoSocialPoster.spec
+
+# Environment & Sensitive Keys
+.env
+.env.*
+!.env.example
+*.key
+license.key
+*.pem
+*.pfx
+
+# Python Cache & Testing Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local SQLite Databases & Logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.lock
+app.lock
+
+# IDE & Editor Metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS System Files
+Thumbs.db
+Desktop.ini
+.DS_Store
 ```
 
 ---
@@ -505,6 +554,10 @@ excluded_modules = [
     'pytest',
     'unittest',
     'tests',
+    'numpy',
+    'scipy',
+    'pandas',
+    'matplotlib',
 ]
 
 a = Analysis(
@@ -704,10 +757,10 @@ if __name__ == "__main__":
 
 ```ini
 ; Inno Setup Script for AutoSocial Poster
-; Generates a professional Windows installer poster-v2.exe with activation check, desktop shortcut and clean uninstaller
+; Generates a professional Windows installer poster-v2.exe with desktop shortcut and clean uninstaller
 
 #define MyAppName "AutoSocial Poster"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "AutoSocial Technologies"
 #define MyAppURL "https://github.com/autosocial-poster"
 #define MyAppExeName "poster-v2.exe"
@@ -735,11 +788,6 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Messages]
-PasswordLabel1=This installation requires an Activation Key.
-PasswordLabel3=Please enter your product Activation Key below to begin installation:
-PasswordEditLabel=&Activation Key:
-
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
@@ -759,37 +807,6 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}
 Name: "{userappdata}\AutoSocialPoster\data"; Flags: uninsneveruninstall
 Name: "{userappdata}\AutoSocialPoster\logs"; Flags: uninsneveruninstall
 Name: "{userappdata}\AutoSocialPoster\config"; Flags: uninsneveruninstall
-
-[Code]
-var
-  SavedActivationKey: String;
-
-function CheckPassword(Password: String): Boolean;
-var
-  Key: String;
-begin
-  Key := Uppercase(Trim(Password));
-  if (Key = 'ASPC-PRO2-2026-X999-9364') or (Key = 'POSTER-V2-PRO-2026') then
-  begin
-    SavedActivationKey := Key;
-    Result := True;
-  end
-  else
-    Result := False;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  ConfigDir, LicenseFile: String;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    ConfigDir := ExpandConstant('{userappdata}\AutoSocialPoster\config');
-    ForceDirectories(ConfigDir);
-    LicenseFile := ConfigDir + '\license.key';
-    SaveStringToFile(LicenseFile, SavedActivationKey, False);
-  end;
-end;
 ```
 
 ---
@@ -1245,7 +1262,8 @@ export default function App() {
     targetAudience: '',
     tone: 'Thought Leadership',
     websiteUrl: '',
-    subreddit: 'r/smallbusiness'
+    subreddit: 'r/smallbusiness',
+    referencePost: ''
   });
 
   const [generatedContent, setGeneratedContent] = useState({
@@ -1640,7 +1658,8 @@ export default function App() {
           target_audience: genForm.targetAudience,
           tone: genForm.tone,
           website_url: genForm.websiteUrl,
-          subreddit: genForm.subreddit
+          subreddit: genForm.subreddit,
+          reference_post: genForm.referencePost
         })
       });
       setGeneratedContent({ linkedin: result.linkedin, reddit: result.reddit });
@@ -2297,6 +2316,24 @@ export default function App() {
                   value={genForm.websiteUrl}
                   onChange={(e) => setGenForm({ ...genForm, websiteUrl: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#E5E0D8] rounded-lg px-3 py-2 text-xs text-[#2C352B] focus:outline-none focus:border-[#3F513D]"
+                />
+              </div>
+
+              <div className="md:col-span-3">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-[#2C352B] flex items-center gap-1.5">
+                    <span>Reference Post / Inspiration (Optional)</span>
+                    <span className="text-[10px] text-[#8C7A6B] bg-[#F4EFEA] px-2 py-0.5 rounded font-normal">Optional</span>
+                  </label>
+                  <span className="text-[11px] text-[#6B7569]">Paste a sample post or format for the AI to emulate style/tone</span>
+                </div>
+                <textarea
+                  rows={3}
+                  maxLength={4000}
+                  placeholder="Paste a viral post, hook, or outline you want the AI to analyze and model the content structure after (optional)..."
+                  value={genForm.referencePost}
+                  onChange={(e) => setGenForm({ ...genForm, referencePost: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#E5E0D8] rounded-lg px-3 py-2 text-xs text-[#2C352B] focus:outline-none focus:border-[#3F513D] resize-y"
                 />
               </div>
             </div>
@@ -3758,6 +3795,7 @@ class GenerateRequest(BaseModel):
     tone: str = "Thought Leadership"
     website_url: str = ""
     subreddit: str = "r/smallbusiness"
+    reference_post: str = ""
 
 class PostCreateRequest(BaseModel):
     topic: str
@@ -3977,6 +4015,7 @@ async def generate(req: GenerateRequest):
         tone=req.tone,
         website_url=req.website_url,
         subreddit=req.subreddit,
+        reference_post=req.reference_post,
     )
 
 @app.get("/api/posts")
@@ -4333,6 +4372,7 @@ DAILY_POST_CAP = int(os.getenv("DAILY_POST_CAP", "5"))
 MAX_INPUT_TOPIC_LENGTH = 500
 MAX_INPUT_MESSAGE_LENGTH = 2000
 MAX_INPUT_AUDIENCE_LENGTH = 500
+MAX_INPUT_REFERENCE_LENGTH = 4000
 MAX_SCHEDULE_DAYS = 7
 DUPLICATE_CHECK_WINDOW_DAYS = 7
 MISSED_POST_THRESHOLD_HOURS = 2
@@ -4368,6 +4408,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
+
+# Ensure numpy compatibility shim is active before loading any packages
+import utils.numpy_compat
 
 import requests
 import uvicorn
@@ -4616,6 +4659,7 @@ from config import (
     MAX_INPUT_TOPIC_LENGTH,
     MAX_INPUT_MESSAGE_LENGTH,
     MAX_INPUT_AUDIENCE_LENGTH,
+    MAX_INPUT_REFERENCE_LENGTH,
 )
 from utils.vault import get_secret
 from utils.logging_config import logger
@@ -4624,6 +4668,7 @@ SYSTEM_PROMPT = """You are an elite B2B social media strategist and executive gh
 You specialize in writing high-performing, viral LinkedIn posts and authentic, high-upvote Reddit community discussions.
 
 Your task is to take the provided core inputs and craft TWO distinct, platform-native drafts in a single API response.
+When a Reference Post / Inspiration is provided, carefully analyze its style, rhythm, structure, angle, or lesson, and adapt the new topic and value proposition accordingly while keeping the content fresh, original, and platform-appropriate. If no reference post is provided, craft standard best-in-class posts based on the topic and guidelines.
 
 ### 1. LINKEDIN POST RULES:
 - **Hook**: Start with a punchy 1-2 sentence hook that stops the scroll (highlight a sharp insight, counter-intuitive truth, or quantifiable metric).
@@ -4681,7 +4726,8 @@ async def generate_drafts(
     target_audience: str,
     tone: str = "Thought Leadership",
     website_url: str = "",
-    subreddit: str = "r/smallbusiness"
+    subreddit: str = "r/smallbusiness",
+    reference_post: str = ""
 ) -> dict[str, str]:
     """Generate platform-specific drafts using Groq API."""
     # Retrieve key from vault first, fallback to env for initial setup
@@ -4699,15 +4745,19 @@ async def generate_drafts(
     clean_tone = sanitize_text(tone)[:100] or "Thought Leadership"
     clean_sub = sanitize_text(subreddit)[:100] or "r/smallbusiness"
     clean_url = sanitize_text(website_url)[:255]
+    clean_ref = sanitize_text(reference_post)[:MAX_INPUT_REFERENCE_LENGTH]
 
     url_instruction = clean_url if clean_url else "None (No URL provided. Do NOT mention any website, link, or CTA link in either post.)"
+
+    ref_instruction = f"\nReference Post / Style Example:\n\"\"\"\n{clean_ref}\n\"\"\"\n(Analyze the structure, tone, or narrative progression of this reference and adapt your drafts accordingly.)" if clean_ref else "None (No reference post provided.)"
 
     user_prompt = f"""Topic: {clean_topic}
 Main Message / Value Proposition: {clean_msg}
 Target Audience: {clean_audience}
 Tone: {clean_tone}
 Target Subreddit: {clean_sub}
-Website URL: {url_instruction}"""
+Website URL: {url_instruction}
+Reference Post: {ref_instruction}"""
 
     model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     logger.info(f"Generating drafts via Groq model: {model} for topic: {clean_topic[:50]}...")
@@ -5538,11 +5588,7 @@ def activate_license(key: str) -> Dict[str, Any]:
     """Validate and store license key in vault."""
     clean = key.strip().upper()
     if not verify_license_checksum(clean):
-        # Allow special evaluation/demo key for trial runs
-        if clean in ("ASPC-TRIAL-DEMO-2026-B8A1", "ASPC-DEV-PASS-FREE-9F2C", "POSTER-V2-PRO-2026"):
-            pass
-        else:
-            return {"success": False, "error": "Invalid license key format or checksum."}
+        return {"success": False, "error": "Invalid license key format or checksum."}
 
     save_secret(LICENSE_KEY_VAULT_KEY, clean)
     save_secret(ACTIVATION_TIMESTAMP_KEY, str(int(time.time())))
@@ -5552,29 +5598,17 @@ def activate_license(key: str) -> Dict[str, Any]:
 def get_license_status() -> Dict[str, Any]:
     """Check activation status."""
     key = get_secret(LICENSE_KEY_VAULT_KEY)
-    if not key:
-        try:
-            from config import APPDATA_DIR
-            lic_file = APPDATA_DIR / "config" / "license.key"
-            if lic_file.exists():
-                saved_key = lic_file.read_text(encoding="utf-8").strip()
-                if verify_license_checksum(saved_key) or saved_key in ("POSTER-V2-PRO-2026", "ASPC-TRIAL-DEMO-2026-B8A1", "ASPC-DEV-PASS-FREE-9F2C"):
-                    activate_license(saved_key)
-                    key = saved_key
-        except Exception:
-            pass
-
-    if not key:
+    if key:
+        masked = key[:9] + "****-****-" + key[-4:] if len(key) >= 16 else key
         return {
-            "activated": False,
-            "license_key": "",
-            "message": "First-run activation required."
+            "activated": True,
+            "license_key": masked,
+            "message": "Active License"
         }
-    
-    masked = key[:9] + "****-****-" + key[-4:] if len(key) >= 16 else key
+
     return {
         "activated": True,
-        "license_key": masked,
+        "license_key": "PRO-ACTIVE",
         "message": "Active License"
     }
 ```
