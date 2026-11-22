@@ -1,374 +1,336 @@
-# AutoSocial Poster
+<div align="center">
 
-> **Professional, local-first Windows desktop suite for AI-powered social media scheduling and automated publishing across LinkedIn and Reddit.**
+# 🚀 AutoSocial Poster
 
-[![Target Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(x64)-blue.svg)](#)
-[![Stack](https://img.shields.io/badge/Stack-React%2019%20%2B%20FastAPI%20%2B%20SQLite-green.svg)](#)
-[![Packaging](https://img.shields.io/badge/Packaging-PyInstaller%20%2B%20Inno%20Setup-orange.svg)](#)
-[![Security](https://img.shields.io/badge/Security-Windows%20DPAPI%20Vault%20%2B%20HMAC-red.svg)](#)
+### Write once. Publish everywhere. Stay consistent.
 
----
+**An AI-powered desktop app that drafts, schedules, and publishes your LinkedIn and Reddit posts, with your data and credentials staying on your own PC.**
 
-## Table of Contents
+![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6?logo=windows&logoColor=white)
+![Backend](https://img.shields.io/badge/backend-FastAPI-009688?logo=fastapi&logoColor=white)
+![Frontend](https://img.shields.io/badge/frontend-React%2019-61DAFB?logo=react&logoColor=black)
+![AI](https://img.shields.io/badge/AI-Groq-F55036)
+![Security](https://img.shields.io/badge/vault-Windows%20DPAPI-success)
+![Trial](https://img.shields.io/badge/free%20trial-30%20days-blueviolet)
 
-1. [Executive Overview](#executive-overview)
-2. [Key Architecture & Security Model](#key-architecture--security-model)
-3. [Core Feature Breakdown](#core-feature-breakdown)
-   - [AI Content Generation (Groq)](#1-ai-content-generation-groq)
-   - [Post Scheduling & Strict 7-Day Calendar](#2-post-scheduling--strict-7-day-calendar)
-   - [Multi-Platform Publishing Engine](#3-multi-platform-publishing-engine)
-   - [Dual-Mode OAuth 2.0 Integration](#4-dual-mode-oauth-20-integration)
-   - [Real-Time Terminal & Execution Logs](#5-real-time-terminal--execution-logs)
-4. [Technology Stack](#technology-stack)
-5. [Project Structure](#project-structure)
-6. [Prerequisites & Development Setup](#prerequisites--development-setup)
-7. [Running in Development Mode](#running-in-development-mode)
-8. [Automated Testing & Verification](#automated-testing--verification)
-9. [Production Packaging & Installer Compilation](#production-packaging--installer-compilation)
-10. [Configuration & Environment Variables](#configuration--environment-variables)
-11. [OAuth Developer Portal Checklist](#oauth-developer-portal-checklist)
-12. [Product Activation & Licensing](#product-activation--licensing)
+[Download](#-download--installation) · [Free Trial](#-get-your-activation-key-30-day-free-trial) · [Features](#-features) · [How It Works](#-how-it-works) · [Security](#-security--privacy) · [FAQ](#-faq)
+
+</div>
 
 ---
 
-## Executive Overview
+## 📖 Overview
 
-**AutoSocial Poster** is an enterprise-grade, standalone Windows desktop application designed for founders, marketers, and content creators to draft, schedule, and automate social media publications.
+Building a strong digital presence takes consistency, and consistency takes time. **AutoSocial Poster** removes the busywork: tell it your topic and audience, let AI draft platform-native posts for **LinkedIn** and **Reddit**, review and edit them, then publish instantly or schedule them for later.
 
-All sensitive operations run **locally on your machine**. There is zero telemetry, no external database, and credentials are never stored in plaintext or transferred to third-party cloud servers.
+It runs as a **standalone Windows desktop app**. There is no cloud account to create, no subscription dashboard to log into, and your tokens never leave your machine.
 
-```
-+-----------------------------------------------------------------------------------+
-|                            WINDOWS DESKTOP RUNTIME                                |
-|                                                                                   |
-|  +-----------------------------------------------------------------------------+  |
-|  |                 PyWebView Native Shell (WebView2 / WinForms)                |  |
-|  |                                                                             |  |
-|  |   +---------------------------------------------------------------------+   |  |
-|  |   |             React 19 Single Page Application (SPA)                  |   |  |
-|  |   |                                                                     |   |  |
-|  |   |   * Post Creation & Multi-Platform Matrix (LinkedIn / Reddit)       |   |  |
-|  |   |   * 7-Day Window Calendar Picker (Strict 7-Day Forward Limit)       |   |  |
-|  |   |   * Groq AI Content Drafter (Streaming & Template Fallback)         |   |  |
-|  |   |   * Connected Accounts & OAuth Central/Custom App Manager           |   |  |
-|  |   |   * Post History, Status Badges, Logs & Analytics Overview          |   |  |
-|  |   +---------------------------------------------------------------------+   |  |
-|  +--------------------------------------|--------------------------------------+  |
-|                                         | Loopback HTTP (127.0.0.1:8000)          |
-|                                         | Headers: X-Session-Token (HMAC)         |
-|  +--------------------------------------v--------------------------------------+  |
-|  |                      FastAPI ASGI Backend (Uvicorn)                         |  |
-|  |                                                                             |  |
-|  |   * Security Middleware (Constant-time token validation)                    |  |
-|  |   * OAuth 2.0 PKCE Engine (Dynamic redirect URI: 127.0.0.1 & localhost)     |  |
-|  |   * Publisher Engine (LinkedIn UGC API & Reddit OAuth API)                  |  |
-|  |   * Background Scheduler Thread (60s tick, daily cap enforcement)           |  |
-|  |   * Groq AI Integration (openai/gpt-oss-120b)                               |  |
-|  |   * Single-Instance Lock (Global\AutoSocialPoster_SingleInstance_Mutex)    |  |
-|  +-----------------------------------------------------------------------------+  |
-|           |                                                      |                |
-|           v                                                      v                |
-|  +------------------------------------+      +---------------------------------+  |
-|  |   SQLite Database                  |      | Windows Credential Manager      |  |
-|  |   %APPDATA%\AutoSocialPoster\      |      | DPAPI Secure Vault              |  |
-|  |   data\social_automation.sqlite3   |      | Tokens, Client Secrets, Keys    |  |
-|  +------------------------------------+      +---------------------------------+  |
-+-----------------------------------------------------------------------------------+
-```
+> **Who is it for?** Founders, freelancers, marketers, consultants, indie hackers, and creators who want to show up consistently on LinkedIn and Reddit without spending hours writing and posting.
 
 ---
 
-## Key Architecture & Security Model
+## ✨ Features
 
-### 1. Windows DPAPI Secure Vault (`keyring`)
-* OAuth access tokens, refresh tokens, client secrets, and Groq API keys are stored encrypted via the **Windows Credential Manager / Data Protection API (DPAPI)** under service `AutoSocialPoster`.
-* GET requests return masked values (`••••••••`); cleartext secrets are never exposed to the frontend or written to SQLite.
+### 🧠 AI Content Drafting
+- Generates **LinkedIn and Reddit drafts side by side** from a single brief, powered by Groq AI.
+- **Platform-native writing:**
+  - **LinkedIn:** punchy hook, scannable spacing, a peer-discussion question, and 3–5 niche hashtags.
+  - **Reddit:** extracted title, practitioner tone, no marketing buzzwords, and no hashtags.
+- **7 tone presets:** Thought Leadership, Conversational, Promotional, Educational, Technical, Storytelling, Controversial / Bold.
+- **Reference post mode:** paste a post you admire and the AI matches its style and rhythm.
+- **Smart CTA handling:** links are included only when you provide a URL.
+- Every draft is **fully editable** with live character counters before anything goes out.
 
-### 2. Ephemeral Session Token Protection
-* The backend generates a cryptographically random 32-byte session token at boot (`secrets.token_hex(32)`).
-* The session token is injected directly into `<script>window.__APP_CONFIG__</script>` in the HTML `<head>`.
-* All protected endpoints (`/api/*`) require the `X-Session-Token` header, validated with constant-time HMAC comparison (`hmac.compare_digest()`) to prevent timing attacks.
-* If a 401 error occurs (e.g. after a backend restart), the client-side API layer automatically calls `/api/bootstrap` to re-synchronize the token and retries the request seamlessly.
+### 📅 Scheduling and Queue Management
+- Interactive **calendar picker** with per-day post indicators.
+- Schedule to **LinkedIn, Reddit, or both** in one step.
+- Quick time presets (`09:00`, `10:00`, `14:00`, `17:00`) and subreddit quick-select tags.
+- **Edit, reschedule, cancel, or delete** any queued post.
+- **Startup catch-up:** if the app was closed when a post came due, it publishes automatically when it is less than 2 hours overdue. Anything older is marked **Missed** so you can review it first.
 
-### 3. Single-Instance Mutex Lock
-* Uses a Win32 Named Mutex (`Global\AutoSocialPoster_SingleInstance_Mutex`) to ensure only one instance of the application runs at any time, avoiding port collisions on `8000` and database locks.
-* Launching a second instance automatically focuses the active application window.
+### 📊 Dashboard and History
+- At-a-glance cards: **Scheduled · Published · Missed/Failed · Connected Platforms**.
+- Alert banner when posts were missed while your PC was off.
+- Full **Posts & History** view with status filters (`All`, `Scheduled`, `Published`, `Missed`, `Failed`, `Draft`) and live search.
+- Built-in **API Log drawer** showing the last 50 requests with expandable request and response payloads.
 
-### 4. Per-User Windows Profile Isolation
-* Application state is stored strictly in `%APPDATA%\AutoSocialPoster\`:
-  * Database: `%APPDATA%\AutoSocialPoster\data\social_automation.sqlite3`
-  * Execution logs: `%APPDATA%\AutoSocialPoster\logs\social_media_poster.log`
-  * Configuration: `%APPDATA%\AutoSocialPoster\config\`
-* Multiple Windows users on the same machine operate with completely isolated profiles and credentials.
+### 🔌 Flexible Integrations
+- **Central Shared App (default):** connect with one click, no developer setup.
+- **Custom Developer App:** bring your own LinkedIn or Reddit credentials, with helper buttons for redirect URIs.
+- Revert to the shared app any time with one click.
 
----
-
-## Core Feature Breakdown
-
-### 1. AI Content Generation (Groq)
-* Powered by Groq Cloud (`openai/gpt-oss-120b` or `llama-3.3-70b-versatile`).
-* Tailors content simultaneously for both platforms from a single prompt:
-  * **LinkedIn:** High-converting hooks, skimmable 1–2 sentence paragraphs, bulleted insights, peer engagement discussion questions, conditional CTA link inclusion, and 3–5 tailored hashtags.
-  * **Reddit:** Extracts an authentic discussion header (`Title:`), formats body in clean Markdown, applies practitioner tone without marketing hype, and omits hashtags.
-* **Tones Supported:** *Thought Leadership, Conversational, Promotional, Educational, Technical, Storytelling, Controversial / Bold*.
-* **Reference Post Learning:** Paste any high-performing post into the *Reference / Inspiration* field to adapt rhythm and structure.
-
-### 2. Post Scheduling & Strict 7-Day Calendar
-* **Strict 7-Day Forward Window:** Posts can only be scheduled between **Today** and **Today + 7 Days** (enforced in both the UI and backend).
-* **Interactive Calendar (`CalendarPicker.jsx`):**
-  * Displays allowed date ranges.
-  * Dates beyond +7 days are disabled with a visual lock icon (`Lock`).
-  * Click any calendar date to view all queued dispatches for that day.
-* **Daily Rate Limit Guard:** Caps daily publications (default: 5 posts/day) to protect accounts from spam detection flags and platform API bans.
-* **7-Day Duplicate Content Guard:** Normalizes text and blocks publishing identical content to the same platform within 7 days.
-* **Background Scheduler Daemon (`scheduler.py`):**
-  * Continuous 60-second polling worker.
-  * **Startup Catch-Up:** Overdue posts by $\le$ 2 hours are caught up and dispatched when the app opens; overdue posts by $>$ 2 hours are marked `missed` for explicit user review.
-
-### 3. Multi-Platform Publishing Engine
-* **LinkedIn UGC REST API:** Uses the `restli` v2 protocol (`https://api.linkedin.com/rest/posts`) with automatic character escaping for little-text syntax (`[`, `]`, `(`, `)`, `{`, `}`, `<`, `>`, `~`, `_`, `*`, `@`, `|`, `\`).
-* **Reddit OAuth API:** Posts directly to target subreddits with automatic title/body parsing.
-* **Atomic Idempotency Lock:** SQLite atomic state transitions (`draft/scheduled -> publishing -> published/failed`) prevent duplicate posting.
-* **Automatic Rate Limit Backoff:** Handles HTTP 429 responses with exponential backoff and retry.
-
-### 4. Dual-Mode OAuth 2.0 Integration
-* **Central Shared App (Default):** Zero configuration required for standard users; developer credentials are maintained on the backend.
-* **Custom Developer App Mode:** Power users can enter their own Client ID, Client Secret, User-Agent, and custom Redirect URIs in **Settings > Integrations**.
-* **1-Click Loopback Negotiation:** Built-in helper buttons to toggle and copy both `127.0.0.1` and `localhost` callback URIs.
-* **1-Click Revert:** Revert to the central shared configuration anytime with a single click.
-
-### 5. Real-Time Terminal & Execution Logs
-* Slide-up API Execution Log Drawer (`Terminal` icon) in the header.
-* Live tracking of HTTP requests, status codes (`200`, `400`, `429`, `500`), endpoints, and request/response payloads.
+### 🛡️ Built-In Account Safeguards
+| Safeguard | What it does |
+| :--- | :--- |
+| **Daily post cap** | Defaults to 5 posts per day per platform to avoid spam flags. |
+| **7-day duplicate guard** | Blocks identical content to the same platform within 7 days. |
+| **Idempotency lock** | Atomic status transition prevents double-posting on slow networks. |
+| **Rate-limit handling** | Exponential backoff and retry on HTTP `429`. |
+| **LinkedIn character escaping** | Reserved characters are escaped so your text is not truncated. |
 
 ---
 
-## Technology Stack
+## 🎁 Get Your Activation Key (30-Day Free Trial)
 
-| Layer | Component | Version / Library |
-| :--- | :--- | :--- |
-| **Frontend UI** | Framework | React 19, Vite 6 |
-| | Styling & Icons | Tailwind CSS v4, Lucide React |
-| **Desktop Shell** | Native Window | PyWebView 6.2 (WebView2 / WinForms) |
-| | Process Control | Win32 Named Mutex (`ctypes`) |
-| **Backend API** | ASGI Framework | FastAPI 0.142, Starlette, Uvicorn 0.54 |
-| | HTTP Client | HTTPX 0.28 (Async) |
-| **Storage & Security** | Local Database | SQLite3 (WAL mode) |
-| | Secure Vault | Windows DPAPI via `keyring 25.7` |
-| | Auth & Cryptography | PKCE, SHA256, HMAC constant-time digest |
-| **Packaging** | Binary Bundler | PyInstaller 6.22 (One-folder mode) |
-| | Installer Compiler | Inno Setup 6 (LZMA2/Max Solid Compression) |
+AutoSocial Poster needs an activation key to install. **You can try everything free for 30 days.**
 
----
+**How to get a key:**
 
-## Project Structure
+1. **Contact me directly** and I will send you a trial key:
+   - 📧 Email: `your-email@example.com`
+   - 💼 LinkedIn: `https://linkedin.com/in/your-profile`
+   - 💬 Other: `your-contact-link`
+2. **Or wait for the public key**, which will be published in this README soon. Star ⭐ or watch the repo to get notified.
 
-```
-social-media-posting-automation/
-├── .env.example                               # Environment configuration template
-├── package.json                               # Frontend dependencies and scripts
-├── requirements.txt                           # Python dependencies pinned
-├── vite.config.js                             # Vite build configuration (Tailwind v4)
-├── AutoSocialPoster.spec                      # PyInstaller build specification
-├── build_production.py                        # Automated end-to-end build pipeline
-├── installer.iss                              # Inno Setup Windows installer script
-├── sign_build.bat                             # Optional code signing batch script
-├── index.html                                 # HTML template with dynamic script injection
-├── linkedin_reddit_social_media_automation_mvp.tsx  # Master React UI component
-│
-├── src/
-│   ├── main.jsx                               # React bootstrap & session initialization
-│   ├── App.jsx                                # Root re-export wrapper
-│   ├── CalendarPicker.jsx                     # 7-day window visual calendar picker
-│   └── style.css                              # Tailwind CSS rules
-│
-├── backend/
-│   ├── app.py                                 # FastAPI application & route declarations
-│   ├── config.py                              # %APPDATA% path resolution & defaults
-│   ├── launcher.py                            # PyWebView shell & single-instance lock
-│   ├── database/
-│   │   └── db.py                              # SQLite connection pool & migrations
-│   ├── services/
-│   │   ├── ai_service.py                      # Groq AI generation & prompt formatting
-│   │   ├── oauth_service.py                   # PKCE OAuth flow & token refresh
-│   │   ├── publisher_service.py               # LinkedIn UGC & Reddit API publisher
-│   │   └── scheduler.py                       # 60s background queue worker
-│   ├── utils/
-│   │   ├── license_check.py                   # Checksum verification & activation
-│   │   ├── logging_config.py                  # Log rotation & formatting
-│   │   ├── numpy_compat.py                    # NumPy compatibility shim
-│   │   ├── single_instance.py                 # Windows Mutex lock
-│   │   └── vault.py                           # Windows DPAPI vault wrapper
-│   └── tests/
-│       ├── test_production_verification.py    # 13-point automated integration tests
-│       └── test_multi_user_isolation.py       # Multi-user profile isolation test
-│
-└── installer_dist/                            # Generated Windows installer (.exe)
-```
+Once you have your key, enter it in the installer wizard. It is saved automatically, so there is nothing to set up later.
+
+> 🔔 **Coming soon:** the public 30-day trial key will be posted here.
 
 ---
 
-## Prerequisites & Development Setup
+## 📥 Download & Installation
 
 ### System Requirements
-* **Operating System:** Windows 10 or Windows 11 (64-bit)
-* **Node.js:** v18.0.0 or higher
-* **Python:** 3.11.x (64-bit recommended)
-* **Inno Setup:** Version 6.x (optional, for compiling the installer)
+| Requirement | Details |
+| :--- | :--- |
+| **OS** | Windows 10 / 11 (x64) |
+| **Admin rights** | Not required (per-user install) |
+| **Runtime** | Microsoft Edge WebView2 (preinstalled on Windows 11; the app falls back to your default browser if missing) |
+| **Internet** | Needed for AI generation and publishing |
 
-### 1. Clone & Setup Python Environment
-```powershell
-# Clone the repository
-git clone https://github.com/your-org/social-media-posting-automation.git
-cd social-media-posting-automation
+### Install in 4 Steps
+1. **Download** the latest installer: `AutoSocialPoster_Setup_v1.0.0.exe` from the [Releases](../../releases) page.
+2. **Run** the installer and enter your **activation key** when prompted.
+3. **Choose** whether to add a desktop shortcut, then finish the wizard.
+4. **Launch** AutoSocial Poster and follow the Quick Start below.
 
-# Create and activate Python virtual environment
-python -m venv .venv
-.venv\Scripts\activate
+> 💾 **Your data is safe.** Databases, logs, and settings live in `%APPDATA%\AutoSocialPoster` and are **never deleted** by updates or uninstalls.
 
-# Install backend dependencies
+---
+
+## 🚦 Quick Start
+
+1. **Add your Groq API key**: *Settings → Groq AI Configuration → Save Groq Key*.
+2. **Connect your accounts**: *Dashboard* or *Settings* → **Connect LinkedIn** / **Connect Reddit**.
+3. **Draft a post**: open **Create**, fill in topic, message, audience, and tone, then click **✨ Generate Content with AI**.
+4. **Review and edit** both drafts.
+5. **Publish Now**, **Save Draft**, or **Schedule** (choose LinkedIn, Reddit, or both).
+6. Track everything in **Posts & History** and the **Calendar**.
+
+> ⚠️ **Keep the app running** at your scheduled time. Posts are dispatched by the local scheduler, which checks every 60 seconds.
+
+---
+
+## 🧭 How It Works
+
+```mermaid
+flowchart LR
+    A[Your Brief<br/>Topic · Audience · Tone] --> B[Groq AI]
+    B --> C[LinkedIn Draft]
+    B --> D[Reddit Draft]
+    C --> E{Edit & Review}
+    D --> E
+    E -->|Publish Now| F[Safeguards<br/>Cap · Duplicate · Lock]
+    E -->|Schedule| G[Local Scheduler<br/>60s polling]
+    G --> F
+    F --> H[LinkedIn API]
+    F --> I[Reddit API]
+```
+
+**Under the hood:**
+
+| Layer | Technology |
+| :--- | :--- |
+| Desktop shell | PyWebView (Edge WebView2) with browser fallback |
+| Backend | FastAPI (Python) |
+| Frontend | React 19 · Tailwind CSS · Lucide icons |
+| Database | SQLite (WAL mode, auto-migrating schema) |
+| Secrets | Windows DPAPI via `keyring` |
+| AI | Groq (`openai/gpt-oss-120b`) |
+| Auth | OAuth 2.0 with PKCE |
+| Packaging | PyInstaller → `poster-v2.exe`, Inno Setup installer |
+
+---
+
+## 🔒 Security & Privacy
+
+Security is designed in from the start.
+
+- **Local-first:** no AutoSocial cloud. Your posts and history stay on your PC.
+- **Encrypted vault:** OAuth tokens, client secrets, and API keys are stored in the **Windows DPAPI vault**, never in plaintext and never in SQLite.
+- **Masked secrets:** the UI never receives your stored secrets back; it shows `••••••••` indicators only.
+- **Session-token handshake:** a fresh random 32-byte token is generated on every launch and required (`X-Session-Token`) for all `/api/*` calls, validated with constant-time comparison.
+- **Self-healing sessions:** after a restart, the UI re-syncs automatically and retries failed requests.
+- **OAuth 2.0 + PKCE:** secure code challenge, with 10-minute expiring state values to prevent CSRF replay.
+- **Input sanitization:** `<script>`, `<iframe>`, and control characters are stripped before AI processing.
+- **Profile isolation:** each Windows user account has its own separate data.
+- **Single-instance lock:** prevents port conflicts and database corruption.
+
+---
+
+## 🖥️ Screens at a Glance
+
+| Screen | What you do there |
+| :--- | :--- |
+| **Dashboard** | See stats, account status, upcoming queue, and missed-post alerts. |
+| **Create** | Brief the AI, edit dual drafts, publish or schedule. |
+| **Posts & History** | Filter, search, edit, publish, cancel, or delete posts. |
+| **Calendar** | Visualize your schedule and manage posts by day. |
+| **Settings** | Activate your license, add API keys, configure OAuth apps. |
+
+<!-- Add screenshots here:
+![Dashboard](docs/screenshots/dashboard.png)
+![Create Post](docs/screenshots/create.png)
+![Calendar](docs/screenshots/calendar.png)
+-->
+
+---
+
+## 📈 Make It Work for Your Digital Presence
+
+- **Stay consistent:** batch a week of posts in one sitting and let the scheduler handle the rest.
+- **Sound like you:** use *Reference Post* mode and tone presets to keep your voice authentic.
+- **Show up where your audience is:** LinkedIn for professional reach, Reddit for community credibility.
+- **Build authority:** share insights, stories, and lessons regularly, and let compounding visibility do the work.
+- **Save hours every week:** go from idea to published post in minutes.
+
+---
+
+## 🔌 REST API (Local)
+
+The app exposes a local API on `127.0.0.1:8000`, used by the built-in UI. Most endpoints require the session token.
+
+<details>
+<summary><b>View endpoint directory</b></summary>
+
+| Method | Endpoint | Auth | Purpose |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/health` | No | Health, database status, uptime |
+| `GET` | `/api/bootstrap` | No | Session token and config bootstrap |
+| `GET` | `/auth/{platform}` | Yes | Start OAuth (PKCE) |
+| `POST` | `/api/auth/{platform}/open-browser` | Yes | Open OAuth login in default browser |
+| `GET` | `/auth/{platform}/callback` | No | OAuth callback and token storage |
+| `GET` | `/api/accounts` | Yes | Connection states and token expiry |
+| `POST` | `/api/accounts/{platform}/disconnect` | Yes | Remove tokens from vault |
+| `GET` | `/api/posts` | Yes | List posts |
+| `POST` | `/api/posts` | Yes | Create or schedule a post |
+| `PATCH` | `/api/posts/{post_id}` | Yes | Edit content, destination, or schedule |
+| `POST` | `/api/posts/{post_id}/publish` | Yes | Publish immediately |
+| `POST` | `/api/posts/{post_id}/cancel` | Yes | Cancel schedule, revert to draft |
+| `DELETE` | `/api/posts/{post_id}` | Yes | Delete post |
+| `POST` | `/api/content/generate` | Yes | Generate dual-platform drafts |
+| `GET` / `POST` | `/api/settings/integrations` | Yes | Read (masked) / save integration settings |
+| `POST` | `/api/settings/integrations/{platform}/reset-to-shared` | Yes | Revert to shared app |
+| `GET` | `/api/license/status` | Yes | License status |
+| `POST` | `/api/license/activate` | Yes | Activate license |
+
+</details>
+
+---
+
+## 🛠️ Development
+
+<details>
+<summary><b>Build from source</b></summary>
+
+> Commands below are a typical workflow, so adjust them to match your repository layout.
+
+```bash
+# 1. Clone
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
+
+# 2. Backend dependencies
 pip install -r requirements.txt
+
+# 3. Frontend build
+cd frontend && npm install && npm run build && cd ..
+
+# 4. Run
+python launcher.py
+
+# 5. Headless verification (health, bootstrap, token injection)
+python launcher.py --check
 ```
 
-### 2. Setup Frontend Dependencies
-```powershell
-# Install Node dependencies
-npm install
-```
+**Packaging:** compile with PyInstaller to `poster-v2.exe`, then build the installer with Inno Setup using `installer.iss`.
 
-### 3. Configure Environment Variables
-Copy `.env.example` to `.env`:
-```powershell
-copy .env.example .env
-```
-Add your Groq API key and optional central OAuth credentials:
-```env
-PORT=8000
-HOST=127.0.0.1
-DAILY_POST_CAP=5
-GROQ_MODEL=openai/gpt-oss-120b
-
-# Optional: Add Groq API Key (or enter directly in app UI Settings)
-GROQ_API_KEY=gsk_your_key_here
-```
+</details>
 
 ---
 
-## Running in Development Mode
+## ❓ FAQ
 
-Run the backend and frontend in separate terminal windows:
+<details>
+<summary><b>Does the app need to be open for scheduled posts to go out?</b></summary>
+Yes. Scheduling is handled by a local background scheduler. If the app was closed at the scheduled time, it catches up on launch (under 2 hours overdue) or marks the post <b>Missed</b> for your review.
+</details>
 
-### Terminal 1: Backend API (FastAPI)
-```powershell
-.venv\Scripts\activate
-uvicorn app:app --reload --app-dir backend --port 8000
-```
+<details>
+<summary><b>Why can I only schedule 7 days ahead?</b></summary>
+This keeps queues fresh and reduces the risk of stale or mistimed content. The limit is enforced in both the UI and the backend.
+</details>
 
-### Terminal 2: Frontend (Vite)
-```powershell
-npm run dev
-```
+<details>
+<summary><b>Is there a mobile app or email feature?</b></summary>
+No. AutoSocial Poster is a Windows desktop application focused on LinkedIn and Reddit publishing.
+</details>
 
-Open your browser to **`http://127.0.0.1:5173`**. The frontend automatically discovers the session token from the backend at `http://127.0.0.1:8000/api/bootstrap`.
+<details>
+<summary><b>Where is my data stored?</b></summary>
+Locally in <code>%APPDATA%\AutoSocialPoster</code>. Secrets are kept in the Windows DPAPI vault.
+</details>
 
----
+<details>
+<summary><b>Do I need my own LinkedIn or Reddit developer app?</b></summary>
+No. The Central Shared App works out of the box. Advanced users can switch to custom credentials in Settings.
+</details>
 
-## Automated Testing & Verification
-
-Run the comprehensive test suite:
-
-```powershell
-# Run the 13-point production verification test
-python backend/tests/test_production_verification.py
-
-# Run Windows user profile data isolation test
-python backend/tests/test_multi_user_isolation.py
-
-# Run security dependency audits
-npm audit
-pip-audit
-```
+<details>
+<summary><b>How do I get an activation key?</b></summary>
+See <a href="#-get-your-activation-key-30-day-free-trial">Get Your Activation Key</a>. Contact me for a 30-day free trial key.
+</details>
 
 ---
 
-## Production Packaging & Installer Compilation
+## ⚖️ Responsible Use
 
-### One-Step Automated Build Script
-To build the complete package (including security audits, React bundle, PyInstaller compilation, and Inno Setup installer):
+AutoSocial Poster is built to help you publish **genuine, valuable content** consistently. Please:
 
-```powershell
-python build_production.py
-```
+- Follow the **Terms of Service and API policies** of LinkedIn and Reddit.
+- Respect **subreddit rules**, since many communities restrict self-promotion.
+- Review every AI-generated draft before publishing. You are responsible for what you post.
 
-### What this script automates:
-1. Runs `npm audit` and `pip-audit` for dependency vulnerabilities.
-2. Compiles React frontend via `npm run build` into `dist/`.
-3. Runs the backend production test suite.
-4. Bundles the application with PyInstaller using `AutoSocialPoster.spec` into `dist/poster-v2/`.
-5. Injects essential Windows runtime DLLs (`libcrypto-3-x64.dll`, `libssl-3-x64.dll`, `libffi-8.dll`, `sqlite3.dll`).
-6. Compiles `installer.iss` using Inno Setup compiler (`ISCC.exe`) into `installer_dist/poster-v2.exe`.
-
-### Headless Verification Mode
-You can verify the packaged executable without opening a UI window:
-```powershell
-.\dist\poster-v2\poster-v2.exe --check
-```
-*Returns `[EXE_VERIFICATION_PASS]` and exits with code 0 if all server and SPA endpoints are healthy.*
+The built-in daily cap and duplicate guard exist to protect your accounts, so please do not try to work around them.
 
 ---
 
-## Configuration & Environment Variables
+## 🗺️ Roadmap
 
-| Variable | Default | Purpose |
-| :--- | :--- | :--- |
-| `PORT` | `8000` | Port for the local FastAPI loopback server. |
-| `HOST` | `127.0.0.1` | Loopback binding address (locked to local machine). |
-| `DAILY_POST_CAP` | `5` | Maximum allowed published posts per platform per day. |
-| `GROQ_MODEL` | `openai/gpt-oss-120b` | Groq AI model used for draft generation. |
-| `LINKEDIN_CLIENT_ID` | `""` | Central developer client ID for LinkedIn. |
-| `LINKEDIN_CLIENT_SECRET` | `""` | Central developer client secret for LinkedIn. |
-| `LINKEDIN_REDIRECT_URI` | `http://127.0.0.1:8000/auth/linkedin/callback` | Registered LinkedIn OAuth callback URI. |
-| `REDDIT_CLIENT_ID` | `""` | Central developer client ID for Reddit. |
-| `REDDIT_CLIENT_SECRET` | `""` | Central developer client secret for Reddit. |
-| `REDDIT_USER_AGENT` | `AutoSocialPoster/1.0 by u/AutoSocialOfficial` | User agent header for Reddit API requests. |
-| `REDDIT_REDIRECT_URI` | `http://127.0.0.1:8000/auth/reddit/callback` | Registered Reddit OAuth callback URI. |
+- [ ] Publicly available trial key for 30 free trail
+- [ ] Additional platforms
+- [ ] Analytics and performance insights
+- [ ] Post templates and content library
+
+*Have an idea? [Open an issue](https://github.com/sairam-s0/social-media-posting-automation/issues) or contact me directly.*
 
 ---
 
-## OAuth Developer Portal Checklist
+## 🤝 Support & Contact
 
-When configuring custom developer credentials in **Settings > Integrations**, ensure your apps have the following configurations:
-
-### LinkedIn Developer Portal
-1. Create an app in the [LinkedIn Developer Portal](https://www.linkedin.com/developers/).
-2. Under **Products**, add:
-   * **Share on LinkedIn**
-   * **Sign In with LinkedIn using OpenID Connect**
-3. Under **Auth > Authorized redirect URLs**, register **both**:
-   * `http://127.0.0.1:8000/auth/linkedin/callback`
-   * `http://localhost:8000/auth/linkedin/callback`
-
-### Reddit App Preferences
-1. Create an app in [Reddit App Preferences](https://www.reddit.com/prefs/apps).
-2. Select type: **installed app** (or **web app**).
-3. Set **redirect uri** to **both**:
-   * `http://127.0.0.1:8000/auth/reddit/callback`
-   * `http://localhost:8000/auth/reddit/callback`
+- 📧 **Email:** `sairam.1242006@gmail.com`
+- 💼 **LinkedIn:** `https://linkedin.com/in/sairam-s0`
+- 🐛 **Bugs and feature requests:** [GitHub Issues](https://github.com/sairam-s0/social-media-posting-automation/issues)
 
 ---
 
-## Product Activation & Licensing
-
-AutoSocial Poster includes a built-in cryptographic license verification module (`license_check.py`):
-* **Key Format:** `ASPC-XXXX-XXXX-XXXX-XXXX` (checksum-validated via SHA-256).
-* **Evaluation / Demo Keys:**
-  * `POSTER-V2-PRO-2026`
-  * `ASPC-TRIAL-DEMO-2026-B8A1`
-  * `ASPC-DEV-PASS-FREE-9F2C`
-* License keys are entered in the installer or under **Settings > License & Activation** in the app. Activated keys are stored encrypted in the Windows DPAPI Vault.
 
 ---
 
-## License
+<div align="center">
 
-Proprietary Software. All rights reserved &copy; AutoSocial Technologies.
+**If AutoSocial Poster helps you grow your presence, give it a ⭐**
+
+Made with ❤️ for creators and builders.
+
+</div>
