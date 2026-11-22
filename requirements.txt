@@ -1,0 +1,12 @@
+# AutoSocial Poster - Pinned Dependencies
+fastapi==0.142.2
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+python-dotenv==1.2.4
+pydantic==2.13.5
+keyring==25.7.0
+cryptography==50.0.2
+pywebview==6.2.1
+requests==2.34.2
+pyinstaller==6.22.3
+pip-audit==2.10.1
